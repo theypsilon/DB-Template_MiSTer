@@ -26,6 +26,8 @@ When a user fetches the files via *downloader* or *update_all*, the downloaded f
 
 You may upload as many files as you want as long as it doesn't violate GitHub constraints (100mb is max size per file).
 
+You should avoid full paths clashes between your files and the files from other databases so that your users don't run into issues when using multiple databases at the same time.
+
 ## How your users will integrate your Custom Database in their MiSTers:
 
 Your users will just have to do the **step 4** of the "How to generate" section. So you should add those lines to your documentation replacing the placeholders with the correct GitHub user and repository name.
