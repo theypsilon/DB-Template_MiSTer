@@ -1,0 +1,22 @@
+name: Test Build DB
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build_db:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Install apt-get utilities
+      run: sudo apt-get install detox sharutils
+
+    - uses: actions/checkout@v2
+
+    - name: Build Custom Database for MiSTer Downloader
+      run: set -o pipefail && python3 build_db.py
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
