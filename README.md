@@ -20,7 +20,7 @@ db_url = https://raw.githubusercontent.com/<YOUR GITHUB USER>/<YOUR GITHUB REPOS
 
 Once you have your database up and running (check previous section to figure out how to set it up), adding files is very straightforward.
 
-Just upload any file to your repository by using GitHub UI (Add File > Upload files), or via git. Once the files show up in your repository, they'll also be added to your database automatically. You may see the *Actions* tab in your repository to see how the automation did its magic.
+Just upload any file to your repository by using GitHub UI (Add File > Upload files), or via git. Once the files show up in your repository, they'll also be added to your database automatically. You may see the *Actions* tab in your repository to see how the automation did its magic if you are curious.
 
 When a user fetches the files via *downloader* or *update_all*, the downloaded file structure will mirror 1:1 the file structure you have in your repository at GitHub. This means, if you have a folder `_Cores/` containing some files in your repository, an identical `_Cores` folder will show up in MiSTer containing the exact same files.
 
