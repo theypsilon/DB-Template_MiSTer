@@ -1,4 +1,4 @@
-name: Test Build DB
+name: Build Custom Database
 
 on:
   push:
@@ -17,6 +17,6 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Build Custom Database for MiSTer Downloader
-      run: set -o pipefail && python3 build_db.py
+      run: set -o pipefail && curl --fail --location https://raw.githubusercontent.com/theypsilon/Downloader_DB-Template_MiSTer/main/.github/build_db.py | python3 -
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

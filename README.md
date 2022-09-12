@@ -7,7 +7,7 @@ Once your database is up, adding files to it is very simple. You'll only have to
 ## How to generate your own Custom Database for the MiSTer Downloader:
 
 1. Create your own public repository on GitHub
-2. Add a new file in your repository named `.github/workflows/build_db.yml` and copy paste [this content](build_db.yml) inside. You may use GitHub UI for this (Add File > Create new file) but don't forget to commit the changes.
+2. Add a new file in your repository named `.github/workflows/build_db.yml` and copy paste [this content](.github/build_db.yml) inside. You may use GitHub UI for this (Add File > Create new file) but don't forget to commit the changes.
 3. After 5 mins, you're database file will be generated at `https://raw.githubusercontent.com/<YOUR GITHUB USER>/<YOUR GITHUB REPOSITORY>/db/db.json.zip` (replacing the <> fields accordingly) and will be ready to be used. For example, if your Github user is `jose` and your repository name is `game_wallpapers`, the url will be: `https://raw.githubusercontent.com/jose/game_wallpapers/db/db.json.zip`
 4. To integrate it in a MiSTer device, add the following section to the end of to the file `downloader.ini` that should be placed at the root of the SD (if it doesn't exist, you may create it for this purpose):
 ```ini
