@@ -1,6 +1,5 @@
 import subprocess
 import urllib.request
-import shutil
 import os
 import sys
 
@@ -15,6 +14,10 @@ def main():
     if not dryrun:
         subprocess.run(['git', 'config', '--global', 'user.email', 'theypsilon@gmail.com'], check=True)
         subprocess.run(['git', 'config', '--global', 'user.name', 'The CI/CD Bot'], check=True)
+        try:
+            os.remove('build_db.py')
+        except _ as FileNotFoundError:
+            pass
 
     urllib.request.urlretrieve('https://raw.githubusercontent.com/MiSTer-devel/Distribution_MiSTer/develop/.github/calculate_db.py', '/tmp/distribution_calculate_db.py')
 
