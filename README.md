@@ -6,15 +6,19 @@ Once your database is up, adding files to it is very simple. You'll only have to
 
 ## How to generate your own Custom Database for the MiSTer Downloader:
 
-1. Create your own public repository on GitHub
-2. Add a new file in your repository named `.github/workflows/build_db.yml` and copy paste [this content](.github/build_db.yml) inside. You may use GitHub UI for this (Add File > Create new file) but don't forget to commit the changes.
-3. After 5 mins, you're database file will be generated at `https://raw.githubusercontent.com/<YOUR GITHUB USER>/<YOUR GITHUB REPOSITORY>/db/db.json.zip` (replacing the <> fields accordingly) and will be ready to be used. For example, if your Github user is `jose` and your repository name is `game_wallpapers`, the url will be: `https://raw.githubusercontent.com/jose/game_wallpapers/db/db.json.zip`
-4. To integrate it in a MiSTer device, add the following section to the end of to the file `downloader.ini` that should be placed at the root of the SD (if it doesn't exist, you may create it for this purpose):
+1. Click on
+    <a style="margin-top:100px;" href="https://github.com/theypsilon/DB-Template_MiSTer/generate">
+        <img src="https://img.shields.io/badge/Use_this_template-2ea44f" 
+            alt="Use this template"
+            title="Create repository from this template"></a>
+button to create your own public Custom Database repository on GitHub.
+2. After less than 5 minutes, you're database file will be generated at `https://raw.githubusercontent.com/<YOUR GITHUB USER>/<YOUR GITHUB REPOSITORY>/db/db.json.zip` (replacing the <> fields accordingly) and will be ready to be used. For example, if your GitHub user is `jose` and your repository name is `game_wallpapers`, the url will be: `https://raw.githubusercontent.com/jose/game_wallpapers/db/db.json.zip`
+3. To integrate it in a MiSTer device, add the following section to the end of to the file `downloader.ini` that should be placed at the root of the SD (if it doesn't exist, you may create it for this purpose):
 ```ini
 [<YOUR GITHUB USER>/<YOUR GITHUB REPOSITORY>]
 db_url = https://raw.githubusercontent.com/<YOUR GITHUB USER>/<YOUR GITHUB REPOSITORY>/db/db.json.zip
 ```
-5. After that, run *downloader* or *update_all* as usual. It will try to fetch the files from your newly created database. If your database is still empty -which is your case if you followed these instructions-, obviously it won't download any file yet, but it will show up in the logs. For adding files to the database check the next section.
+4. After that, run *downloader* or *update_all* as usual. It will try to fetch the files from your newly created database. If your database is still empty -which is your case if you followed these instructions-, obviously it won't download any file yet, but it will show up in the logs. For adding files to the database check the next section.
 
 ## How to add files to your already working Custom Database:
 
@@ -30,7 +34,7 @@ You should avoid full paths clashes between your files and the files from other 
 
 ## How your users will integrate your Custom Database in their MiSTers:
 
-Your users will just have to do the **step 4** of the "How to generate" section. So you should add those lines to your documentation replacing the placeholders with the correct GitHub user and repository name.
+Your users will just have to do the **step 3** of the "How to generate" section. So you should add those lines to your documentation replacing the placeholders with the correct GitHub user and repository name.
 
 For example, assuming GitHub user is "jose" and the repository is called "game_wallpapers", your users will have to add these lines to the bottom of `downloader.ini`:
 
