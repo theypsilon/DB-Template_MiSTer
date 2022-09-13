@@ -5,20 +5,20 @@ By following these instructions, you'll create your own [Custom Database for the
 Once your database is up, adding files to it is very simple. You'll only have to upload files to your repository on GitHub, and after that, your users will fetch these files directly in their devices, by just running *downloader* or *update_all*.
 
 ## How to generate your own Custom Database for the MiSTer Downloader:
-
-1. Click on
+1. Make sure you are logged in into your GitHub account. Or register a new account if you don't have any yet.
+2. Then click on
     <a style="margin-top:100px;" href="https://github.com/theypsilon/DB-Template_MiSTer/generate">
         <img src="https://img.shields.io/badge/Use_this_template-2ea44f" 
             alt="Use this template"
             title="Create repository from this template"></a>
 button to create your own public Custom Database repository on GitHub.
-2. After less than 5 minutes, you're database file will be generated at `https://raw.githubusercontent.com/<YOUR GITHUB USER>/<YOUR GITHUB REPOSITORY>/db/db.json.zip` (replacing the <> fields accordingly) and will be ready to be used. For example, if your GitHub user is `jose` and your repository name is `game_wallpapers`, the url will be: `https://raw.githubusercontent.com/jose/game_wallpapers/db/db.json.zip`
-3. To integrate it in a MiSTer device, add the following section to the end of to the file `downloader.ini` that should be placed at the root of the SD (if it doesn't exist, you may create it for this purpose):
+3. After less than 5 minutes, you're database file will be generated at `https://raw.githubusercontent.com/<YOUR GITHUB USER>/<YOUR GITHUB REPOSITORY>/db/db.json.zip` (replacing the <> fields accordingly) and will be ready to be used. For example, if your GitHub user is `jose` and your repository name is `game_wallpapers`, the url will be: `https://raw.githubusercontent.com/jose/game_wallpapers/db/db.json.zip`
+4. To integrate it in a MiSTer device, add the following section to the end of to the file `downloader.ini` that should be placed at the root of the SD (if it doesn't exist, you may create it for this purpose):
 ```ini
 [<YOUR GITHUB USER>/<YOUR GITHUB REPOSITORY>]
 db_url = https://raw.githubusercontent.com/<YOUR GITHUB USER>/<YOUR GITHUB REPOSITORY>/db/db.json.zip
 ```
-4. After that, run *downloader* or *update_all* as usual. It will try to fetch the files from your newly created database. If your database is still empty -which is your case if you followed these instructions-, obviously it won't download any file yet, but it will show up in the logs. For adding files to the database check the next section.
+5. After that, run *downloader* or *update_all* as usual. It will try to fetch the files from your newly created database. If your database is still empty -which is your case if you followed these instructions-, obviously it won't download any file yet, but it will show up in the logs. For adding files to the database check the next section.
 
 ## How to add files to your already working Custom Database:
 
@@ -38,7 +38,7 @@ A couple of things to consider when uploading files:
 
 ## How your users will integrate your Custom Database in their MiSTers:
 
-Your users will just have to do the **step 3** of the "How to generate" section. So you should add those lines to your documentation replacing the placeholders with the correct GitHub user and repository name.
+Your users will just have to do the **step 4** of the "How to generate" section. So you should add those lines to your documentation replacing the placeholders with the correct GitHub user and repository name.
 
 For example, assuming GitHub user is "jose" and the repository is called "game_wallpapers", your users will have to add these lines to the bottom of `downloader.ini`:
 
