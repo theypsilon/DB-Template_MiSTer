@@ -26,11 +26,15 @@ Once you have your database up and running (check previous section to figure out
 
 Just upload any file to your repository by using GitHub UI (Add File > Upload files), or via git. Once the files show up in your repository, they'll also be added to your database automatically. You may see the *Actions* tab in your repository to see how the automation did its magic if you are curious.
 
-When a user fetches the files via *downloader* or *update_all*, the downloaded file structure will mirror 1:1 the file structure you have in your repository at GitHub. This means, if you have a folder `_Cores/` containing some files in your repository, an identical `_Cores` folder will show up in MiSTer containing the exact same files.
+A couple of things to consider when uploading files:
 
-You may upload as many files as you want as long as they don't violate GitHub constraints (100mb is max size per file).
+- When a user fetches the files via *downloader* or *update_all*, the downloaded file structure will mirror 1:1 the file structure you have in your repository at GitHub. This means, if you have a folder `_Cores/` containing some files in your repository, an identical `_Cores` folder will show up in MiSTer containing the exact same files.
 
-You should avoid full paths clashes between your files and the files from other databases so that your users don't run into issues when using multiple databases at the same time.
+- The files README.md, LICENSE, build_db.py, and the .github folder won't be included in your database. Just ignore them, they won't be installed in the devices.
+
+- You may upload as many files as you want as long as they don't violate GitHub constraints (100mb is max size per file).
+
+- You should avoid full path clashes between your files and the files from other databases so that your users don't run into issues when using multiple databases at the same time.
 
 ## How your users will integrate your Custom Database in their MiSTers:
 
@@ -43,4 +47,4 @@ For example, assuming GitHub user is "jose" and the repository is called "game_w
 db_url = https://raw.githubusercontent.com/jose/game_wallpapers/db/db.json.zip
 ```
 
-This needs to be done just once by your users. After that, running *downloader* or *update_all* will distribute your files to them.
+This needs to be done just once by your users. After that, whenever they run *downloader* or *update_all* they'll also be installing your updated files.
