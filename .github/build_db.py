@@ -14,10 +14,19 @@ def main():
     if not dryrun:
         subprocess.run(['git', 'config', '--global', 'user.email', 'theypsilon@gmail.com'], check=True)
         subprocess.run(['git', 'config', '--global', 'user.name', 'The CI/CD Bot'], check=True)
-        try:
-            os.remove('build_db.py')
-        except _ as FileNotFoundError:
-            pass
+        
+        needs_commit = False
+        if os.path.exists('build_db.py'):
+            subprocess.run(['git', 'rm', 'build_db.py'], check=True)
+            needs_commit = True
+
+        if os.path.exists('.github/build_db.py'):
+            subprocess.run(['git', 'rm', '.github/build_db.py'], check=True)
+            needs_commit = True
+
+        if needs_commit:
+            subprocess.run(['git', 'commit', '-m','Cleaning build_db.py'], check=True)
+            subprocess.run(['git', 'push'], check=True)
 
     urllib.request.urlretrieve('https://raw.githubusercontent.com/MiSTer-devel/Distribution_MiSTer/develop/.github/calculate_db.py', '/tmp/distribution_calculate_db.py')
 
