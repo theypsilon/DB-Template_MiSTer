@@ -17,7 +17,7 @@ def main():
         subprocess.run(['git', 'config', '--global', 'user.email', 'theypsilon@gmail.com'], check=True)
         subprocess.run(['git', 'config', '--global', 'user.name', 'The CI/CD Bot'], check=True)
         
-        cleanup_build_py()
+        cleanup_build_py(db_id)
 
     urllib.request.urlretrieve('https://raw.githubusercontent.com/MiSTer-devel/Distribution_MiSTer/develop/.github/calculate_db.py', '/tmp/distribution_calculate_db.py')
 
