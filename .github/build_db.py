@@ -24,7 +24,7 @@ def main():
     db_url = f'https://raw.githubusercontent.com/{db_id}/db/db.json.zip'
     base_files_url = f'https://raw.githubusercontent.com/{db_id}/%s/'
 
-    subprocess.run(['rm', '*.sh'])
+    subprocess.run(['rm *.sh'], shell=True)
 
     calculate_env = {
         'DB_ID': db_id,
