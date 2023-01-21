@@ -28,6 +28,8 @@ def main():
 
     subprocess.run(['rm *.sh'], shell=True, stderr=subprocess.STDOUT)
 
+    run(['python3', '-m', 'pip', 'install', 'Pillow'])
+
     run(['python3', '/tmp/distribution_db_operator.py', 'build', '.'], env={
         'DB_ID': db_id,
         'DB_URL': db_url,
