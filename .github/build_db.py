@@ -12,19 +12,22 @@ def main():
         log('Dry run')
         dryrun = True
 
-    db_id = os.getenv('GITHUB_REPOSITORY', 'theypsilon/test')
+    github_repo = os.getenv('GITHUB_REPOSITORY', 'theypsilon/test')
+    db_id = os.getenv('DB_ID', None)
+    if db_id is None:
+        db_id = github_repo
 
     if not dryrun:
         run(['git', 'config', '--global', 'user.email', 'theypsilon@gmail.com'])
         run(['git', 'config', '--global', 'user.name', 'The CI/CD Bot'])
         
-        cleanup_build_py(db_id)
+        cleanup_build_py(github_repo)
 
     log('downloading db_operator.py')
     urllib.request.urlretrieve('https://raw.githubusercontent.com/MiSTer-devel/Distribution_MiSTer/develop/.github/db_operator.py', '/tmp/distribution_db_operator.py')
 
-    db_url = f'https://raw.githubusercontent.com/{db_id}/db/db.json.zip'
-    base_files_url = f'https://raw.githubusercontent.com/{db_id}/%s/'
+    db_url = f'https://raw.githubusercontent.com/{github_repo}/db/db.json.zip'
+    base_files_url = f'https://raw.githubusercontent.com/{github_repo}/%s/'
 
     subprocess.run(['rm *.sh'], shell=True, stderr=subprocess.STDOUT)
 
@@ -35,6 +38,7 @@ def main():
         'DB_URL': db_url,
         'DB_JSON_NAME': 'db.json',
         'BASE_FILES_URL': base_files_url,
+        'FINDER_IGNORE': os.getenv('FINDER_IGNORE', '')
     })
 
     if not dryrun and os.path.exists('db.json') and passes_db_tests(db_id):
@@ -79,8 +83,8 @@ def passes_db_tests(db_id):
         
     return True
 
-def cleanup_build_py(db_id):  
-    if db_id.lower().strip() == 'theypsilon/db-template_mister':
+def cleanup_build_py(github_repo):  
+    if github_repo.lower().strip() == 'theypsilon/db-template_mister':
         log('Skipping cleanup_build_py')
         return
 
