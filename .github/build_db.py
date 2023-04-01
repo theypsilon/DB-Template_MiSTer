@@ -38,7 +38,8 @@ def main():
         'DB_URL': db_url,
         'DB_JSON_NAME': 'db.json',
         'BASE_FILES_URL': base_files_url,
-        'FINDER_IGNORE': os.getenv('FINDER_IGNORE', '')
+        'FINDER_IGNORE': os.getenv('FINDER_IGNORE', ''),
+        'BROKEN_MRAS_IGNORE': os.getenv('BROKEN_MRAS_IGNORE', 'true')
     })
 
     if not dryrun and os.path.exists('db.json') and passes_db_tests(db_id):
