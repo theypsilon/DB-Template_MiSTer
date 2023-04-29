@@ -32,6 +32,13 @@ def main():
     subprocess.run(['rm *.sh'], shell=True, stderr=subprocess.STDOUT)
 
     run(['python3', '-m', 'pip', 'install', 'Pillow'])
+    
+    external_files = 'external_files.csv'
+    external_repos_check = subprocess.run(["git", "ls-remote", "--heads", "origin", "external_repos_files"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if 'refs/heads/external_repos_files' in external_repos_check.stdout:
+        run(["git", "fetch", "origin", "external_repos_files"])
+        run(["git", "checkout", "FETCH_HEAD", "--", "external_repos_files.csv"])
+        external_files = 'external_files.csv external_repos_files.csv'
 
     run(['python3', '/tmp/distribution_db_operator.py', 'build', '.'], env={
         'DB_ID': db_id,
@@ -40,7 +47,7 @@ def main():
         'BASE_FILES_URL': base_files_url,
         'FINDER_IGNORE': os.getenv('FINDER_IGNORE', '') + ' external_files.csv',
         'BROKEN_MRAS_IGNORE': os.getenv('BROKEN_MRAS_IGNORE', 'true'),
-        'EXTERNAL_FILES': 'external_files.csv'
+        'EXTERNAL_FILES': external_files
     })
 
     if not dryrun and os.path.exists('db.json') and passes_db_tests(db_id):
