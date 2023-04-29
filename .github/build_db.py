@@ -39,6 +39,7 @@ def main():
         run(["git", "fetch", "origin", "external_repos_files"])
         run(["git", "checkout", "FETCH_HEAD", "--", "external_repos_files.csv"])
         external_files = 'external_files.csv external_repos_files.csv'
+        log('Added external_repos_files.csv from branch external_repos_files!')
 
     run(['python3', '/tmp/distribution_db_operator.py', 'build', '.'], env={
         'DB_ID': db_id,
