@@ -46,7 +46,7 @@ def main():
         'DB_URL': db_url,
         'DB_JSON_NAME': 'db.json',
         'BASE_FILES_URL': base_files_url,
-        'FINDER_IGNORE': os.getenv('FINDER_IGNORE', '') + ' external_files.csv',
+        'FINDER_IGNORE': os.getenv('FINDER_IGNORE', '') + ' ' + external_files,
         'BROKEN_MRAS_IGNORE': os.getenv('BROKEN_MRAS_IGNORE', 'true'),
         'EXTERNAL_FILES': external_files
     })
