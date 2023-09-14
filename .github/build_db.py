@@ -24,7 +24,7 @@ def main():
         cleanup_build_py(github_repo)
 
     log('downloading db_operator.py')
-    urllib.request.urlretrieve('https://raw.githubusercontent.com/MiSTer-devel/Distribution_MiSTer/develop/.github/db_operator.py', '/tmp/distribution_db_operator.py')
+    urllib.request.urlretrieve('https://raw.githubusercontent.com/MiSTer-devel/Distribution_MiSTer/main/.github/db_operator.py', '/tmp/distribution_db_operator.py')
 
     db_url = f'https://raw.githubusercontent.com/{github_repo}/db/db.json.zip'
     base_files_url = f'https://raw.githubusercontent.com/{github_repo}/%s/'
