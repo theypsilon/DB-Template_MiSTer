@@ -30,7 +30,7 @@ A couple of things to consider when uploading files:
 
 - When a user fetches the files via *downloader* or *update_all*, the downloaded file structure will mirror 1:1 the file structure you have in your repository at GitHub. This means, if you have a folder `_Cores/` containing some files in your repository, an identical `_Cores` folder will show up in MiSTer containing the exact same files.
 
-- The files README.md, LICENSE, build_db.py, and the .github folder won't be included in your database. Just ignore them, they won't be installed in the devices.
+- The files `README.md`, `LICENSE`, and the `.github` folder won't be included in your database. Just ignore them, they won't be installed in the devices. The file `external_files.csv` won't show up on your device either, but the files listed inside it will.
 
 - You may upload as many files as you want as long as they don't violate GitHub constraints (100mb is max size per file).
 
