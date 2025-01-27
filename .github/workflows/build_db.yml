@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Install apt-get utilities
+      run: sudo apt-get install sharutils
+
     - uses: actions/checkout@v2
 
     - name: Build Custom Database for MiSTer Downloader
