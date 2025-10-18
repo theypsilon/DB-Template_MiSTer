@@ -1,8 +1,27 @@
+# Copyright (c) 2022-2025 José Manuel Barroso Galindo <theypsilon@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# You can download the latest version of this tool from:
+# https://github.com/theypsilon/DB-Template_MiSTer
+
 import subprocess
-import urllib.request
 import os
 import sys
 import tempfile
+import traceback
+from datetime import datetime, timezone
 
 def main():
     log('Building database...')
@@ -24,7 +43,8 @@ def main():
         cleanup_build_py(github_repo)
 
     log('downloading db_operator.py')
-    urllib.request.urlretrieve('https://raw.githubusercontent.com/MiSTer-devel/Distribution_MiSTer/main/.github/db_operator.py', '/tmp/distribution_db_operator.py')
+    curl('https://raw.githubusercontent.com/MiSTer-devel/Distribution_MiSTer/main/.github/db_operator.py',
+         '/tmp/distribution_db_operator.py')
 
     db_url = f'https://raw.githubusercontent.com/{github_repo}/db/db.json.zip'
     base_files_url = f'https://raw.githubusercontent.com/{github_repo}/%s/'
@@ -34,7 +54,8 @@ def main():
     run(['python3', '-m', 'pip', 'install', 'Pillow'])
     
     external_files = 'external_files.csv'
-    external_repos_check = subprocess.run(["git", "ls-remote", "--heads", "origin", "external_repos_files"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    external_repos_check = subprocess.run(["git", "ls-remote", "--heads", "origin", "external_repos_files"],
+                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if 'refs/heads/external_repos_files' in external_repos_check.stdout:
         run(["git", "fetch", "origin", "external_repos_files"])
         run(["git", "checkout", "FETCH_HEAD", "--", "external_repos_files.csv"])
@@ -60,6 +81,31 @@ def main():
         run(['git', 'commit', '-m','Creating database'])
         run(['git', 'push', '--force','origin', 'db'])
 
+        if os.getenv('TRACK_RELEASE', 'true').lower() != 'false':
+            try:
+                log('Tracking release...')
+                db_commit_hash = subprocess.run(['git', 'rev-parse', 'HEAD'],
+                                                stdout=subprocess.PIPE, text=True, check=True).stdout.strip()
+                releases_check = subprocess.run(['git', 'ls-remote', '--heads', 'origin', 'db-template/releases'],
+                                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                if 'refs/heads/db-template/releases' in releases_check.stdout:
+                    run(['git', 'fetch', 'origin', 'db-template/releases'])
+                    run(['git', 'checkout', 'db-template/releases'])
+                else:
+                    run(['git', 'checkout', '--orphan', 'db-template/releases'])
+
+                run(['git', 'reset', '--hard'])
+
+                with open('commits.txt', 'a') as f:
+                    f.write(f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}: {db_commit_hash}\n")
+
+                run(['git', 'add', 'commits.txt'])
+                run(['git', 'commit', '-m', f'Track release {db_commit_hash}'])
+                run(['git', 'push', 'origin', 'db-template/releases'])
+            except Exception as e:
+                log(f'Warning: Failed to track release: {e}')
+                log(traceback.format_exc())
+
     return 0
 
 def passes_db_tests(db_id):
@@ -67,7 +113,8 @@ def passes_db_tests(db_id):
 
     with tempfile.TemporaryDirectory() as temp_folder:
         log('downloading downloader.sh')
-        urllib.request.urlretrieve('https://raw.githubusercontent.com/MiSTer-devel/Downloader_MiSTer/main/downloader.sh', temp_folder + '/downloader.sh')
+        curl('https://raw.githubusercontent.com/MiSTer-devel/Downloader_MiSTer/main/downloader.sh',
+             temp_folder + '/downloader.sh')
         run(['chmod', '+x', 'downloader.sh'], cwd=temp_folder)
 
         downloader_ini_content = f"""
@@ -116,6 +163,10 @@ def run(commands, env=None, cwd=None):
     if env is not None: log('with env:', env)
     if cwd is not None: log('with cwd:', cwd)
     subprocess.run(commands, cwd=cwd, env=env, check=True, stderr=subprocess.STDOUT)
+
+def curl(url, output_path):
+    log(f'Downloading {url} to {output_path}')
+    run(['curl', '--fail', '--location', '--output', output_path, url])
 
 def log(*text): print(*text, flush=True)
 
