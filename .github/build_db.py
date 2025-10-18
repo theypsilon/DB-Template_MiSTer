@@ -86,13 +86,13 @@ def main():
                 log('Tracking release...')
                 db_commit_hash = subprocess.run(['git', 'rev-parse', 'HEAD'],
                                                 stdout=subprocess.PIPE, text=True, check=True).stdout.strip()
-                releases_check = subprocess.run(['git', 'ls-remote', '--heads', 'origin', 'db-template/releases'],
+                releases_check = subprocess.run(['git', 'ls-remote', '--heads', 'origin', 'db/releases'],
                                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-                if 'refs/heads/db-template/releases' in releases_check.stdout:
-                    run(['git', 'fetch', 'origin', 'db-template/releases'])
-                    run(['git', 'checkout', 'db-template/releases'])
+                if 'refs/heads/db/releases' in releases_check.stdout:
+                    run(['git', 'fetch', 'origin', 'db/releases'])
+                    run(['git', 'checkout', 'db/releases'])
                 else:
-                    run(['git', 'checkout', '--orphan', 'db-template/releases'])
+                    run(['git', 'checkout', '--orphan', 'db/releases'])
 
                 run(['git', 'reset', '--hard'])
 
@@ -101,7 +101,7 @@ def main():
 
                 run(['git', 'add', 'commits.txt'])
                 run(['git', 'commit', '-m', f'Track release {db_commit_hash}'])
-                run(['git', 'push', 'origin', 'db-template/releases'])
+                run(['git', 'push', 'origin', 'db/releases'])
             except Exception as e:
                 log(f'Warning: Failed to track release: {e}')
                 log(traceback.format_exc())
