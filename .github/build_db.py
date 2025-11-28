@@ -102,6 +102,7 @@ def main():
                 run(['git', 'add', 'commits.txt'])
                 run(['git', 'commit', '-m', f'Track release {db_commit_hash}'])
                 run(['git', 'push', 'origin', 'db-releases'])
+                run(['git', 'checkout', 'db'])
             except Exception as e:
                 log(f'Warning: Failed to track release: {e}')
                 log(traceback.format_exc())
