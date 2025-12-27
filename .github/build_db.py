@@ -136,7 +136,7 @@ def passes_db_tests(db_id):
         with open(temp_folder + '/downloader.ini', 'w') as fini:
             fini.write(downloader_ini_content)
 
-        run(['./downloader.sh'], cwd=temp_folder, env={'DEBUG': 'true', 'LOGLEVEL': 'debug', 'CURL_SSL': ''})
+        run(['./downloader.sh'], cwd=temp_folder, env={'DEBUG': 'true', 'LOGLEVEL': 'debug', 'CURL_SSL': '', 'SKIP_FREE_SPACE_CHECKS': 'true'})
         log('The test went well.')
         
     return True
