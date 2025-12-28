@@ -113,32 +113,12 @@ def passes_db_tests(db_id):
     log('Testing database...')
 
     with tempfile.TemporaryDirectory() as temp_folder:
-        log('downloading downloader.sh')
-        curl('https://raw.githubusercontent.com/MiSTer-devel/Downloader_MiSTer/main/downloader.sh',
-             temp_folder + '/downloader.sh')
-        run(['chmod', '+x', 'downloader.sh'], cwd=temp_folder)
+        log('downloading downloader_test.py')
+        curl('https://raw.githubusercontent.com/MiSTer-devel/Downloader_MiSTer/refs/heads/main/.github/downloader_test.py', temp_folder + '/downloader_test.py')
+        run(['chmod', '+x', 'downloader_test.py'], cwd=temp_folder)
+        run(['./downloader_test.py', db_id, f'{os.getcwd()}/db.json'], cwd=temp_folder)
 
-        downloader_ini_content = f"""
-            [MiSTer]
-            base_path = {temp_folder}/
-            base_system_path = {temp_folder}/
-            update_linux = false
-            allow_reboot  = 0
-            verbose = false
-            downloader_retries = 0
-
-            [{db_id}]
-            db_url = {os.getcwd()}/db.json
-        """
-        log('downloader.ini content:')
-        log(downloader_ini_content)
-        
-        with open(temp_folder + '/downloader.ini', 'w') as fini:
-            fini.write(downloader_ini_content)
-
-        run(['./downloader.sh'], cwd=temp_folder, env={'DEBUG': 'true', 'LOGLEVEL': 'debug', 'CURL_SSL': '', 'SKIP_FREE_SPACE_CHECKS': 'true'})
-        log('The test went well.')
-        
+    log('The test went well.')    
     return True
 
 def cleanup_build_py(github_repo):  
