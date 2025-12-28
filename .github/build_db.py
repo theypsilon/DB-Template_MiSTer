@@ -113,7 +113,7 @@ def passes_db_tests(db_id):
     log('\nTesting database...\n')
 
     with tempfile.TemporaryDirectory() as temp_folder:
-        curl('https://raw.githubusercontent.com/MiSTer-devel/Downloader_MiSTer/refs/heads/main/.github/downloader_test.py', temp_folder + '/downloader_test.py')
+        curl('https://github.com/MiSTer-devel/Downloader_MiSTer/releases/download/latest/downloader_test.py', temp_folder + '/downloader_test.py')
         run(['chmod', '+x', 'downloader_test.py'], cwd=temp_folder)
         run(['./downloader_test.py', db_id, f'{os.getcwd()}/db.json'], cwd=temp_folder)
 
