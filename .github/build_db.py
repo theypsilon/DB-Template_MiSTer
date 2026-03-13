@@ -77,10 +77,9 @@ def main():
     if not dryrun and os.path.exists('db.json') and passes_db_tests(db_id):
         log('Pushing database...')
         run(['zip', 'db.json.zip', 'db.json'])
-        drop_in_ini, drop_in_zip = create_drop_in_database_files(db_id, db_url)
         run(['git', 'checkout', '--orphan','db'])
         run(['git', 'reset'])
-        run(['git', 'add', 'db.json.zip', drop_in_ini, drop_in_zip])
+        run(['git', 'add', 'db.json.zip', *create_drop_in_database_files(db_id, db_url)])
         run(['git', 'commit', '-m','Creating database'])
         run(['git', 'push', '--force','origin', 'db'])
 
@@ -142,18 +141,23 @@ def cleanup_build_py(github_repo):
         run(['git', 'push'])
 
 def create_drop_in_database_files(db_id, db_url):
-    sanitized_db_id = sanitize_db_id_for_filename(db_id)
-    drop_in_ini = f'downloader_{sanitized_db_id}.ini'
-    drop_in_zip = f'downloader_{sanitized_db_id}.zip'
-    drop_in_contents = f'[{db_id}]\ndb_url = {db_url}\n'
+    try:
+        sanitized_db_id = sanitize_db_id_for_filename(db_id)
+        drop_in_ini = f'downloader_{sanitized_db_id}.ini'
+        drop_in_zip = f'downloader_{sanitized_db_id}.zip'
+        drop_in_contents = f'[{db_id}]\ndb_url = {db_url}\n'
 
-    with open(drop_in_ini, 'w', encoding='utf-8', newline='\n') as f:
-        f.write(drop_in_contents)
+        with open(drop_in_ini, 'w', encoding='utf-8', newline='\n') as f:
+            f.write(drop_in_contents)
 
-    with zipfile.ZipFile(drop_in_zip, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
-        archive.writestr(drop_in_ini, drop_in_contents)
+        with zipfile.ZipFile(drop_in_zip, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr(drop_in_ini, drop_in_contents)
 
-    return drop_in_ini, drop_in_zip
+        return [drop_in_ini, drop_in_zip]
+    except Exception as e:
+        log(f'Warning: Failed to create drop-in database files: {e}')
+        log(traceback.format_exc())
+        return []
 
 def sanitize_db_id_for_filename(db_id):
     sanitized_db_id = re.sub(r'[^A-Za-z0-9._-]+', '_', db_id).strip('._-')
