@@ -38,9 +38,15 @@ A couple of things to consider when uploading files:
 
 ## How your users will integrate your Custom Database in their MiSTers:
 
-Your users will just have to do the **step 4** of the "How to generate" section. So you should add those lines to your documentation replacing the placeholders with the correct GitHub user and repository name.
+Your users may integrate your database in two different ways.
 
-For example, assuming GitHub user is "jose" and the repository is called "game_wallpapers", your users will have to add these lines to the bottom of `downloader.ini`:
+The easiest option is to use the generated drop-in database. Assuming GitHub user is "jose" and the repository is called "game_wallpapers", your users may download:
+
+`https://raw.githubusercontent.com/jose/game_wallpapers/db/downloader_jose_game_wallpapers.zip`
+
+After that, they just have to extract `downloader_jose_game_wallpapers.ini` from that ZIP file and place it next to `downloader.ini` in the root of the SD card.
+
+If they prefer to do it manually instead, they may add the following lines to the bottom of `downloader.ini`:
 
 ```ini
 [jose/game_wallpapers]
