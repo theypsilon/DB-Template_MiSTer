@@ -60,3 +60,7 @@ This needs to be done just once by your users. After that, whenever they run *do
 After you have your own repository based on this template, a good idea would be to edit your `README.md` describing the content of your database and how to use it. That way users will learn about your Database and will integrate it into their MiSTer's easily.
 
 Feel free to remove any reference to the original template there.
+
+## DB Inspector
+
+You may use this tool to inspect the resulting database easily: https://theypsilon.github.io/DB-Inspector_MiSTer
