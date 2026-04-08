@@ -28,21 +28,21 @@ import zipfile
 from datetime import datetime, timezone
 
 def main():
-    checkout_auth_config_key = None
-    try:
-        if os.getenv('GITHUB_ACTIONS') == 'true':
-            checkout_auth_config_key = github_actions_checkout()
-        main_impl()
-    finally:
-        cleanup_github_actions_checkout_auth(checkout_auth_config_key)
-
-def main_impl():
-    log('Building database...')
-
     dryrun = False
     if len(sys.argv) >= 2 and sys.argv[1] == '-d':
         log('Dry run')
         dryrun = True
+
+    checkout_auth_config_key = None
+    try:
+        if not dryrun and os.getenv('GITHUB_ACTIONS') == 'true':
+            checkout_auth_config_key = github_actions_checkout()
+        main_impl(dryrun)
+    finally:
+        cleanup_github_actions_checkout_auth(checkout_auth_config_key)
+
+def main_impl(dryrun):
+    log('Building database...')
 
     github_repo = os.getenv('GITHUB_REPOSITORY', 'theypsilon/test')
     db_id = os.getenv('DB_ID', None)
