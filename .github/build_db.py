@@ -16,6 +16,8 @@
 # You can download the latest version of this tool from:
 # https://github.com/theypsilon/DB-Template_MiSTer
 
+import base64
+import shutil
 import subprocess
 import os
 import re
@@ -26,6 +28,14 @@ import zipfile
 from datetime import datetime, timezone
 
 def main():
+    checkout_auth_config_key = None
+    try:
+        if os.getenv('GITHUB_ACTIONS') == 'true':
+            checkout_auth_config_key = github_actions_checkout()
+    finally:
+        cleanup_github_actions_checkout_auth(checkout_auth_config_key)
+
+def main_impl():
     log('Building database...')
 
     dryrun = False
@@ -164,6 +174,177 @@ def sanitize_db_id_for_filename(db_id):
     if sanitized_db_id == '':
         raise ValueError(f'Unable to derive a drop-in filename from DB_ID "{db_id}"')
     return sanitized_db_id
+
+## GIT CHECKOUT
+
+def github_actions_checkout():
+    workspace = os.environ['GITHUB_WORKSPACE']
+    repo = os.environ['GITHUB_REPOSITORY']
+    token = os.environ['GITHUB_TOKEN']
+    ref = os.environ.get('GITHUB_REF', 'refs/heads/main')
+    commit = os.environ.get('GITHUB_SHA', '')
+    server_url = os.environ.get('GITHUB_SERVER_URL', 'https://github.com')
+
+    os.chdir(workspace)
+
+    if os.path.exists('.git'):
+        log('Repository already checked out.')
+        return None
+
+    log(f'Checking out {repo}@{ref}...')
+
+    git_version_out = subprocess.run(['git', 'version'], capture_output=True, text=True, check=True).stdout.strip()
+    git_version_match = re.search(r'\d+\.\d+(\.\d+)?', git_version_out)
+    if not git_version_match:
+        raise RuntimeError(f'Unable to determine git version from: {git_version_out}')
+
+    # Matches GitCommandManager.gitEnv — inherited by every git subprocess
+    os.environ['GIT_TERMINAL_PROMPT'] = '0'
+    os.environ['GCM_INTERACTIVE'] = 'Never'
+    os.environ['GIT_LFS_SKIP_SMUDGE'] = '1'
+    os.environ['GIT_HTTP_USER_AGENT'] = f'git/{git_version_match.group(0)} (github-actions-checkout)'
+
+    token_b64 = base64.b64encode(f'x-access-token:{token}'.encode()).decode()
+    auth_header = f'AUTHORIZATION: basic {token_b64}'
+
+    # Matches git-auth-helper.ts configureTempGlobalConfig() + safe.directory setup
+    # (git-source-provider.ts getSource(), settings.setSafeDirectory = true by default)
+    runner_temp = os.environ.get('RUNNER_TEMP', tempfile.gettempdir())
+    temp_home = tempfile.mkdtemp(dir=runner_temp)
+    original_home = os.environ.get('HOME')
+    src_gitconfig = os.path.join(original_home or os.path.expanduser('~'), '.gitconfig')
+    dst_gitconfig = os.path.join(temp_home, '.gitconfig')
+    if os.path.exists(src_gitconfig):
+        shutil.copy2(src_gitconfig, dst_gitconfig)
+    else:
+        open(dst_gitconfig, 'w').close()
+    os.environ['HOME'] = temp_home
+
+    try:
+        run(['git', 'config', '--global', '--add', 'safe.directory', workspace])
+
+        # Matches git-source-provider.ts getSource() + git-auth-helper.ts configureToken()
+        run(['git', 'init', workspace])
+        run(['git', 'remote', 'add', 'origin', f'{server_url}/{repo}'])
+        run(['git', 'config', '--local', 'gc.auto', '0'])
+        auth_config_key = f'http.{server_url}/.extraheader'
+        placeholder = 'AUTHORIZATION: basic ***'
+        run(['git', 'config', '--local', auth_config_key, placeholder])
+        git_config_path = os.path.join(workspace, '.git', 'config')
+        content = open(git_config_path, encoding='utf-8').read()
+        if content.count(placeholder) != 1:
+            raise RuntimeError(f'Unable to replace auth placeholder in {git_config_path}')
+        with open(git_config_path, 'w', encoding='utf-8') as f:
+            f.write(content.replace(placeholder, auth_header, 1))
+
+        refspec = get_github_actions_checkout_refspec(ref, commit)
+        run(['git', '-c', 'protocol.version=2', 'fetch', '--no-tags', '--prune', '--progress',
+             '--no-recurse-submodules', '--depth=1', 'origin', *refspec])
+
+        checkout_ref, checkout_start_point = get_github_actions_checkout_info(ref, commit)
+        checkout_command = ['git', 'checkout', '--progress', '--force']
+        if checkout_start_point:
+            checkout_command.extend(['-B', checkout_ref, checkout_start_point])
+        else:
+            checkout_command.append(checkout_ref)
+        run(checkout_command)
+        return auth_config_key
+    except Exception:
+        cleanup_github_actions_checkout_auth(auth_config_key if 'auth_config_key' in locals() else None)
+        raise
+    finally:
+        # Matches authHelper.removeGlobalConfig()
+        if original_home is not None:
+            os.environ['HOME'] = original_home
+        else:
+            os.environ.pop('HOME', None)
+        shutil.rmtree(temp_home, ignore_errors=True)
+
+def get_github_actions_checkout_info(ref, commit):
+    if not ref and not commit:
+        raise RuntimeError('Args ref and commit cannot both be empty')
+
+    ref_kind, ref_name, full_ref = parse_github_actions_checkout_ref(ref)
+
+    if ref_kind == 'sha':
+        return commit, ''
+    if ref_kind == 'branch':
+        return ref_name, f'refs/remotes/origin/{ref_name}'
+    if ref_kind == 'pull':
+        return f'refs/remotes/pull/{ref_name}', ''
+    if ref_kind in ('tag', 'ref'):
+        return commit or full_ref, ''
+    if git_branch_exists(f'origin/{ref_name}', remote=True):
+        return ref_name, f'refs/remotes/origin/{ref_name}'
+    if git_tag_exists(ref_name):
+        return f'refs/tags/{ref_name}', ''
+    raise RuntimeError(f"A branch or tag with the name '{ref}' could not be found")
+
+def get_github_actions_checkout_refspec(ref, commit):
+    if not ref and not commit:
+        raise RuntimeError('Args ref and commit cannot both be empty')
+
+    ref_kind, ref_name, full_ref = parse_github_actions_checkout_ref(ref)
+
+    if commit:
+        if ref_kind == 'branch':
+            return [f'+{commit}:refs/remotes/origin/{ref_name}']
+        if ref_kind == 'pull':
+            return [f'+{commit}:refs/remotes/pull/{ref_name}']
+        if ref_kind == 'tag':
+            return [f'+{commit}:{full_ref}']
+        return [commit]
+    if ref_kind == 'unqualified':
+        return [
+            f'+refs/heads/{ref}*:refs/remotes/origin/{ref}*',
+            f'+refs/tags/{ref}*:refs/tags/{ref}*'
+        ]
+    if ref_kind == 'branch':
+        return [f'+{full_ref}:refs/remotes/origin/{ref_name}']
+    if ref_kind == 'pull':
+        return [f'+{full_ref}:refs/remotes/pull/{ref_name}']
+    return [f'+{full_ref}:{full_ref}']
+
+def parse_github_actions_checkout_ref(ref):
+    if not ref:
+        return 'sha', '', ''
+
+    heads_prefix = 'refs/heads/'
+    pull_prefix = 'refs/pull/'
+    tags_prefix = 'refs/tags/'
+    upper_ref = ref.upper()
+
+    if upper_ref.startswith(heads_prefix.upper()):
+        return 'branch', ref[len(heads_prefix):], ref
+    if upper_ref.startswith(pull_prefix.upper()):
+        return 'pull', ref[len(pull_prefix):], ref
+    if upper_ref.startswith(tags_prefix.upper()):
+        return 'tag', ref[len(tags_prefix):], ref
+    if upper_ref.startswith('REFS/'):
+        return 'ref', ref, ref
+    return 'unqualified', ref, ref
+
+def git_branch_exists(branch, remote=False):
+    command = ['git', 'branch', '--list']
+    if remote:
+        command.append('--remote')
+    command.append(branch)
+    output = subprocess.run(command, capture_output=True, text=True, check=True).stdout
+    return output.strip() != ''
+
+def git_tag_exists(tag):
+    output = subprocess.run(['git', 'tag', '--list', tag], capture_output=True, text=True, check=True).stdout
+    return output.strip() != ''
+
+def cleanup_github_actions_checkout_auth(auth_config_key):
+    if not auth_config_key:
+        return
+
+    log(f'Cleaning up checkout auth for {auth_config_key}')
+    subprocess.run(['git', 'config', '--local', '--unset-all', auth_config_key], check=False,
+                   stderr=subprocess.STDOUT)
+
+## GENERAL UTILS
 
 def run(commands, env=None, cwd=None):
     log(' '.join(commands))
