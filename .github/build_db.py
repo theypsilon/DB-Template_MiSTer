@@ -32,6 +32,7 @@ def main():
     try:
         if os.getenv('GITHUB_ACTIONS') == 'true':
             checkout_auth_config_key = github_actions_checkout()
+        main_impl()
     finally:
         cleanup_github_actions_checkout_auth(checkout_auth_config_key)
 
