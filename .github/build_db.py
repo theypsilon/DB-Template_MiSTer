@@ -54,6 +54,7 @@ def main_impl(dryrun):
         run(['git', 'config', '--global', 'user.name', 'The CI/CD Bot'])
         
         cleanup_build_py(github_repo)
+        clean_workflow(github_repo)
 
     log('downloading db_operator.py')
     curl('https://raw.githubusercontent.com/MiSTer-devel/Distribution_MiSTer/main/.github/db_operator.py',
@@ -150,6 +151,34 @@ def cleanup_build_py(github_repo):
     if needs_commit:
         run(['git', 'commit', '-m','BOT: Cleaning build_db.py'])
         run(['git', 'push'])
+
+def clean_workflow(github_repo):
+    if github_repo.lower().strip() == 'theypsilon/db-template_mister':
+        log('Skipping cleanup_build_py')
+        return
+
+    try:
+        workflow_path = os.path.join('.github', 'workflows', 'build_db.yml')
+        if not os.path.exists(workflow_path):
+            return
+
+        with open(workflow_path, encoding='utf-8') as f:
+            original_lines = f.readlines()
+
+        filtered_lines = [line for line in original_lines if 'actions/checkout@v2' not in line]
+        if filtered_lines == original_lines:
+            return
+
+        log(f'Removing actions/checkout@v2 from {workflow_path}')
+        with open(workflow_path, 'w', encoding='utf-8', newline='') as f:
+            f.writelines(filtered_lines)
+
+        run(['git', 'add', workflow_path])
+        run(['git', 'commit', '-m', 'BOT: Cleaning build_db workflow'])
+        run(['git', 'push'])
+    except Exception as e:
+        log(f'Warning: Failed to clean workflow: {e}')
+        log(traceback.format_exc())
 
 def create_drop_in_database_files(db_id, db_url):
     try:
