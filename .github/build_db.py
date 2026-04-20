@@ -82,7 +82,8 @@ def main_impl(dryrun):
         'BASE_FILES_URL': base_files_url,
         'FINDER_IGNORE': os.getenv('FINDER_IGNORE', '') + ' ' + external_files,
         'BROKEN_MRAS_IGNORE': os.getenv('BROKEN_MRAS_IGNORE', 'true'),
-        'EXTERNAL_FILES': external_files
+        'EXTERNAL_FILES': external_files,
+        'OMIT_DUAL_SDRAM_CORES': os.getenv('OMIT_DUAL_SDRAM_CORES', 'false')
     })
 
     if not dryrun and os.path.exists('db.json') and passes_db_tests(db_id):
