@@ -59,7 +59,7 @@ def main_impl(dryrun):
     curl('https://raw.githubusercontent.com/MiSTer-devel/Distribution_MiSTer/main/.github/db_operator.py',
          '/tmp/distribution_db_operator.py')
 
-    db_url = f'https://raw.githubusercontent.com/{github_repo}/db/db.json.zip'
+    db_url = os.getenv('DB_URL', f'https://raw.githubusercontent.com/{github_repo}/db/db.json.zip')
     base_files_url = f'https://raw.githubusercontent.com/{github_repo}/%s/'
 
     subprocess.run(['rm *.sh'], shell=True, stderr=subprocess.STDOUT)
