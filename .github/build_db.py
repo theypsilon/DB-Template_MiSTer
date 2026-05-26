@@ -29,7 +29,7 @@ from datetime import datetime, timezone
 
 def main():
     dryrun = False
-    if len(sys.argv) >= 2 and sys.argv[1] == '-d':
+    if len(sys.argv) >= 2 and sys.argv[1] in ['-d', '--dry-run']:
         log('Dry run')
         dryrun = True
 
