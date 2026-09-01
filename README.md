@@ -35,13 +35,25 @@ A couple of things to consider when uploading files:
 
 ## How your users will integrate your Custom Database in their MiSTers:
 
-Your users may integrate your database in two different ways.
+Your users can integrate your database in two ways.
 
-The easiest option is to use the generated drop-in database. Assuming GitHub user is "jose" and the repository is called "game_wallpapers", your users may download:
+### Drop-in database
+
+The easiest option is for users to drag and drop a file onto their SD card.
+
+For example, if your GitHub username is `jose` and your repository is `game_wallpapers`, users can download:
 
 `https://raw.githubusercontent.com/jose/game_wallpapers/db/downloader_jose_game_wallpapers.zip`
 
-After that, they just have to extract `downloader_jose_game_wallpapers.ini` from that ZIP file and place it next to `downloader.ini` in the root of the SD card.
+Then they only need to:
+
+1. Extract `downloader_jose_game_wallpapers.ini` from the ZIP.
+2. Copy it to the **root of the MiSTer SD card**, next to `downloader.ini`.
+
+That's it. The database is ready to use.
+
+
+### Manual INI editing (for Advanced Users)
 
 If they prefer to do it manually instead, they may add the following lines to the bottom of `downloader.ini`:
 
