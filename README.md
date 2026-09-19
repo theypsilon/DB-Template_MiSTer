@@ -15,17 +15,19 @@ button to create your own public Custom Database repository on GitHub.
 3. After less than 5 minutes, you're database file will be generated at `https://raw.githubusercontent.com/<YOUR GITHUB USER>/<YOUR GITHUB REPOSITORY>/db/db.json.zip` (replacing the <> fields accordingly) and will be ready to be used. For example, if your GitHub user is `jose` and your repository name is `game_wallpapers`, the url will be: `https://raw.githubusercontent.com/jose/game_wallpapers/db/db.json.zip`
 4. To integrate it in a MiSTer device, download the following file: `https://raw.githubusercontent.com/<YOUR GITHUB USER>/<YOUR GITHUB REPOSITORY>/db/downloader_<YOUR GITHUB USER>_<YOUR GITHUB REPOSITORY>.zip`.
 Then extract the `.ini` file from it and place it in the root of the SD card.
-5. After that, run *downloader* or *update_all* as usual. It will try to fetch the files from your newly created database. If your database is still empty -which is your case if you followed these instructions-, obviously it won't download any file yet, but it will show up in the logs. For adding files to the database check the next section.
+5. After that, run *update* or *update_all* as usual. It will try to fetch the files from your newly created database. If your database is still empty -which is your case if you followed these instructions-, obviously it won't download any file yet, but it will show up in the logs. For adding files to the database check the next section.
 
 ## How to add files to your already working Custom Database:
 
 Once you have your database up and running (check previous section to figure out how to set it up), adding files is very straightforward.
 
-Just upload any file to your repository by using GitHub UI (Add File > Upload files), or via git. Once the files show up in your repository, they'll also be added to your database automatically. You may see the *Actions* tab in your repository to see how the automation did its magic if you are curious. **NEW:** If you want to add files without uploading them to the repository, you may use the [external_files.csv](external_files.csv) file for that.
+Just upload any file to your repository by using GitHub UI (Add File > Upload files), or via git. Once the files show up in your repository, they'll also be added to your database automatically. Alternatively, to include files without uploading them to the repository, add their external locations and corresponding paths to [external_files.csv](external_files.csv).
+
+After adding the files, you may see the *Actions* tab in your repository to see how the automation did its magic if you are curious.
 
 A couple of things to consider when uploading files:
 
-- When a user fetches the files via *downloader* or *update_all*, the downloaded file structure will mirror 1:1 the file structure you have in your repository at GitHub. This means, if you have a folder `_Cores/` containing some files in your repository, an identical `_Cores` folder will show up in MiSTer containing the exact same files.
+- When a user fetches the files via *update* or *update_all*, the downloaded file structure will mirror 1:1 the file structure you have in your repository at GitHub. This means, if you have a folder `_Cores/` containing some files in your repository, an identical `_Cores` folder will show up in MiSTer containing the exact same files.
 
 - The files `README.md`, `LICENSE`, and the `.github` folder won't be included in your database. Just ignore them, they won't be installed in the devices. The file `external_files.csv` won't show up on your device either, but the files listed inside it will.
 
